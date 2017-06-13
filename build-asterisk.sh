@@ -17,6 +17,9 @@ curl -vsL http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk
 # 1.5 jobs per core works out okay
 : ${JOBS:=$(( $(nproc) + $(nproc) / 2 ))}
 
+# special thanks to https://gist.github.com/madsen/51d6160a906187b026d0
+patch -p1 main/tcptls.c < /asterisk-13.5.0-twilio-tls.patch
+
 ./configure  --with-resample --with-pjproject-bundled
 make menuselect/menuselect menuselect-tree menuselect.makeopts
 

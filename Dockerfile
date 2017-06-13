@@ -43,8 +43,9 @@ RUN apt-get update -qq && \
     pip install j2cli && \
     apt-get purge -y --auto-remove && rm -rf /var/lib/apt/lists/*
 
-ENV ASTERISK_VERSION=14.0.2
+ENV ASTERISK_VERSION=13.5.0
 COPY build-asterisk.sh /build-asterisk
+COPY asterisk-13.5.0-twilio-tls.patch /asterisk-13.5.0-twilio-tls.patch
 RUN /build-asterisk && rm -f /build-asterisk
 COPY asterisk-docker-entrypoint.sh /
 CMD ["/usr/sbin/asterisk", "-f"]

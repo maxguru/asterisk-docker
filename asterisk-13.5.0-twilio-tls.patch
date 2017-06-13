@@ -1,0 +1,33 @@
+--- old/main/tcptls.c	2015-09-27 11:17:38.207388448 -0500
++++ new/main/tcptls.c	2015-09-27 11:27:09.760105826 -0500
+@@ -555,6 +555,12 @@
+ 	ao2_cleanup(i->private_data);
+ }
+ 
++static int is_twilio_hostname(const char* host)
++{
++  const size_t len = strlen(host);
++  return ((len > 11) && !strcasecmp(host + (len - 11), ".twilio.com"));
++}
++
+ /*! \brief
+ * creates a FILE * from the fd passed by the accept thread.
+ * This operation is potentially expensive (certificate verification),
+@@ -635,6 +641,7 @@
+ 					X509_NAME *name = X509_get_subject_name(peer);
+ 					int pos = -1;
+ 					int found = 0;
++					const int twilio_hack = is_twilio_hostname(tcptls_session->parent->hostname);
+ 
+ 					for (;;) {
+ 						/* Walk the certificate to check all available "Common Name" */
+@@ -652,7 +659,8 @@
+ 						if (str2) {
+ 							if (strlen((char *) str2) != ret) {
+ 								ast_log(LOG_WARNING, "Invalid certificate common name length (contains NULL bytes?)\n");
+-							} else if (!strcasecmp(tcptls_session->parent->hostname, (char *) str2)) {
++							} else if (!strcasecmp(tcptls_session->parent->hostname, (char *) str2) ||
++								   (twilio_hack && is_twilio_hostname((char *) str2))) {
+ 								found = 1;
+ 							}
+ 							ast_debug(3, "SSL Common Name compare s1='%s' s2='%s'\n", tcptls_session->parent->hostname, str2);
